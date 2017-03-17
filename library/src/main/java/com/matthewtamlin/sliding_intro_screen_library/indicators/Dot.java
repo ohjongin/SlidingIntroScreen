@@ -20,12 +20,14 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.animation.ValueAnimator;
+import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Color;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.OvalShape;
+import android.os.Build;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.Gravity;
@@ -294,15 +296,24 @@ public final class Dot extends RelativeLayout {
 	 * @throws IllegalArgumentException
 	 * 		if startSize, endSize or duration are less than 0
 	 */
-	private void animateDotChange(final int startSize, final int endSize, final int startColor,
-			final int endColor, final int duration) {
-		if (startSize < 0) {
+    @SuppressLint("NewApi")
+    private void animateDotChange(final int startSize, final int endSize, final int startColor,
+                                  final int endColor, final int duration) {
+        if (startSize < 0) {
 			throw new IllegalArgumentException("startSize cannot be less than 0");
 		} else if (endSize < 0) {
 			throw new IllegalArgumentException("endSize cannot be less than 0");
 		} else if (duration < 0) {
 			throw new IllegalArgumentException("duration cannot be less than 0");
-		}
+        }
+
+        // To keep backward compatibility
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB) {
+            if (currentAnimator != null) {
+                currentAnimator.end();
+            }
+            return;
+        }
 
 		// To avoid conflicting animations, cancel any existing animation
 		if (currentAnimator != null) {
@@ -567,10 +578,15 @@ public final class Dot extends RelativeLayout {
 	 * @param animate
 	 * 		whether or not the transition should be animated
 	 */
-	public void toggleState(final boolean animate) {
-		if (currentAnimator != null) {
-			currentAnimator.cancel();
-		}
+    @SuppressLint("NewApi")
+    public void toggleState(final boolean animate) {
+        if (currentAnimator != null) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+                currentAnimator.cancel();
+            } else {
+                currentAnimator.end();
+            }
+        }
 
 		if (state != State.ACTIVE) {
 			setActive(animate);
@@ -587,11 +603,16 @@ public final class Dot extends RelativeLayout {
 	 * @param animate
 	 * 		whether or not the transition should be animated
 	 */
-	public void setInactive(final boolean animate) {
+    @SuppressLint("NewApi")
+    public void setInactive(final boolean animate) {
 		// Any existing animation will conflict with this animations and must be cancelled
 		if (currentAnimator != null) {
-			currentAnimator.cancel();
-		}
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+                currentAnimator.cancel();
+            } else {
+                currentAnimator.end();
+            }
+        }
 
 		// Animate only if the animation is requested, is necessary, and will actually display
 		final boolean shouldAnimate =
@@ -614,11 +635,16 @@ public final class Dot extends RelativeLayout {
 	 * @param animate
 	 * 		whether or not the transition should be animated
 	 */
-	public void setActive(final boolean animate) {
+    @SuppressLint("NewApi")
+    public void setActive(final boolean animate) {
 		// Any existing animation will conflict with this animations and must be cancelled
 		if (currentAnimator != null) {
-			currentAnimator.cancel();
-		}
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+                currentAnimator.cancel();
+            } else {
+                currentAnimator.end();
+            }
+        }
 
 		// Animate only if the animation is requested, is necessary, and will actually display
 		final boolean shouldAnimate =

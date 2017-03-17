@@ -1,1 +1,5 @@
-<manifest package="com.matthewtamlin.sliding_intro_screen_library"/>
+<manifest package="com.matthewtamlin.sliding_intro_screen_library"
+          xmlns:tools="http://schemas.android.com/tools">
+
+    <uses-sdk tools:overrideLibrary="com.matthewtamlin.android_utilities_library"/>
+</manifest>
